@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Portal</title>
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: #00ff00;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+}
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+/* Glitch effect */
+#portal-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    animation: glitch 1.5s infinite;
+}
+@keyframes glitch {
+    0% { text-shadow: 2px 0 #00ff00, -2px 0 #00ff00; }
+    20% { text-shadow: -2px 2px #00ff00, 2px -2px #00ff00; }
+    40% { text-shadow: 2px -2px #00ff00, -2px 2px #00ff00; }
+    60% { text-shadow: -2px -2px #00ff00, 2px 2px #00ff00; }
+    80% { text-shadow: 2px 0 #00ff00, -2px 0 #00ff00; }
+    100% { text-shadow: -2px 2px #00ff00, 2px -2px #00ff00; }
+}
+
+#passwordInput {
+    padding: 10px;
+    font-size: 1.3rem;
+    background: black;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    outline: none;
+    width: 220px;
+    text-align: center;
+}
+
+#submitBtn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    background: black;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    cursor: pointer;
+}
+
+/* Hidden clickable game box */
+#hiddenGameBox {
+    position: absolute;
+    top: 80%;
+    left: 20%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    opacity: 0; /* completely invisible */
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="portal-container">
+    <h1>ENTER PASSWORD TO ACCESS CORE</h1>
+    <input type="text" id="passwordInput" placeholder="Password">
+    <br>
+    <button id="submitBtn">ENTER</button>
+</div>
+
+<!-- Hidden Game Box (4 clicks to unlock game page) -->
+<div id="hiddenGameBox"></div>
+
+<script>
+// MATRIX RAIN
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+const fontSize = 16;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#00ff00";
+    ctx.font = fontSize + "px monospace";
+
+    for(let i=0; i<drops.length; i++){
+        const text = chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
+}
+setInterval(drawMatrix, 50);
+
+// PASSWORD LOGIC
+document.getElementById("submitBtn").addEventListener("click", ()=>{
+    const pass = document.getElementById("passwordInput").value;
+    if(pass === "IH2026"){
+        window.location.href = "core.html";
+    } else {
+        alert("Incorrect password");
+    }
+});
+
+// HIDDEN GAME CLICK (4 times)
+let clickCount = 0;
+document.getElementById("hiddenGameBox").addEventListener("click", ()=>{
+    clickCount++;
+    if(clickCount >=4){
+        window.location.href = "game.html";
+    }
+});
+</script>
+
+</body>
+</html>
