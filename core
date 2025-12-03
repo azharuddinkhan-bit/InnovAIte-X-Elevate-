@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORE ACCESS GRANTED</title>
+<style>
+body {
+    margin:0;
+    background:white;
+    color:#00aa00;
+    font-family:"Courier New", monospace;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    flex-direction:column;
+    overflow:hidden;
+}
+#coreTextContainer {
+    text-align:center;
+}
+#coreTextContainer p {
+    opacity:0;
+    margin:8px 0;
+    font-size:2rem;
+    color:#00aa00;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+}
+</style>
+</head>
+<body>
+
+<div id="coreTextContainer">
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+</div>
+
+<script>
+// TYPING ANIMATION
+const lines = [
+    "ACCESS GRANTED",
+    "Initializing CORE Systems...",
+    "Decrypting Authentication...",
+    "Loading Secure Channels...",
+    "Welcome, Agent."
+];
+
+function startTyping() {
+    const container = document.getElementById('coreTextContainer');
+    let currentLine = 0;
+
+    function typeLine() {
+        const lineEl = container.children[currentLine];
+        let charIndex = 0;
+
+        function typeChar() {
+            if(charIndex < lines[currentLine].length){
+                lineEl.textContent += lines[currentLine][charIndex];
+                charIndex++;
+                setTimeout(typeChar, 80);
+            } else {
+                lineEl.style.opacity = 1;
+                currentLine++;
+                if(currentLine < lines.length){
+                    setTimeout(typeLine, 300);
+                } else {
+                    // Redirect to Google after typing completes
+                    setTimeout(() => {
+                        window.location.href = "https://www.google.com";
+                    }, 2000);
+                }
+            }
+        }
+        typeChar();
+    }
+    typeLine();
+}
+
+startTyping();
+</script>
+
+</body>
+</html>
