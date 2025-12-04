@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacker Terminal Game</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: #00ff00;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+    display: flex;
+}
+
+/* -------- LEFT SIDE: KEYLOGGER -------- */
+#keylogBox {
+    width: 260px;
+    border-right: 1px solid #00ff00;
+    padding: 10px;
+    height: 100vh;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.4);
+}
+
+#keylogBox h3 { margin-top: 0; }
+
+/* -------- RIGHT SIDE: TERMINAL -------- */
+#terminal {
+    padding: 20px;
+    flex-grow: 1;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+input, button {
+    background: black;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 6px;
+    font-family: monospace;
+}
+
+/* Output panel */
+#hackOutput {
+    display: none;
+    margin-top: 20px;
+    border: 1px solid #00ff00;
+    padding: 10px;
+    height: 350px;
+    overflow-y: auto;
+    white-space: pre-line;
+    background: rgba(0,0,0,0.6);
+}
+
+.hidden { display: none; }
+
+/* Distortion effect */
+.distortChar {
+    display: inline-block;
+    animation: distort 140ms infinite;
+}
+
+@keyframes distort {
+    0% { opacity: 0.2; transform: scale(1) rotate(0); }
+    20% { opacity: 0.6; transform: scale(1.3) rotate(3deg); }
+    40% { opacity: 0.3; transform: scale(0.7) rotate(-3deg); }
+    60% { opacity: 0.5; transform: scale(1.4) rotate(2deg); }
+    80% { opacity: 0.7; transform: scale(1.1) rotate(-2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* CRT Lines */
+#crt {
+    position: fixed;
+    top: 0; left: 0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:9999;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,0,0.08),
+        rgba(0,255,0,0.08) 3px,
+        rgba(0,255,0,0.02) 4px
+    );
+    animation: crtPulse 0.25s infinite;
+}
+
+@keyframes crtPulse {
+    0% { opacity: 0.18; }
+    50% { opacity: 0.23; }
+    100% { opacity: 0.18; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="crt"></div>
+
+<!-- LEFT SIDE KEYLOGGER -->
+<div id="keylogBox">
+    <h3>Keylog Monitor</h3>
+    <pre id="keylog"></pre>
+</div>
+
+<!-- RIGHT SIDE TERMINAL -->
+<div id="terminal">
+    <h2>TERMINAL ACCESS</h2>
+
+    <p><b>Level #1 — CORE SEQUENCE ANOMALY</b></p>
+
+<pre style="line-height:1.5;">
+Δ-Sequence Collapse Test
+-------------------------------------
+3 → 6.0041
+6 → 12.0099
+12 → 20.97  → normalized → 21
+21 → 32.99  → normalized → 33
+33 → 47.92  → normalized → 48
+48 → ???
+
+Δ-inversion and cascade pruning required.
+</pre>
+
+    <p>Enter stabilized result:</p>
+    <input type="text" id="puzzleInput">
+    <button id="submitPuzzle">SUBMIT</button>
+
+    <div id="hackOutput"></div>
+</div>
+
+<script>
+/* ------------------- KEYLOGGER --------------------- */
+let keylog = document.getElementById("keylog");
+
+window.addEventListener("keydown", (e) => {
+    let t = `[${new Date().toLocaleTimeString()}] ${e.key}\n`;
+    keylog.textContent += t;
+    keylog.scrollTop = keylog.scrollHeight;
+});
+
+/* ------------------- PUZZLE --------------------- */
+document.getElementById("submitPuzzle").addEventListener("click", () => {
+    const v = document.getElementById("puzzleInput").value.trim();
+
+    if (v === "66") runLargeOutput();
+    else alert("Incorrect. Try again.");
+});
+
+/* ------------------- LOG OUTPUT --------------------- */
+function runLargeOutput() {
+    const box = document.getElementById("hackOutput");
+    box.style.display = "block";
+    box.innerHTML = "";
+
+    let lines = [
+        "[CORE ENTRY] Primary resolver engaged.",
+        "Index-map stabilizers running...",
+        "Neutralizing δ-packets...",
+        "Re-linking broken entropy strands...",
+        "Modifier-plane drift detected.",
+        "Local actuator mismatch → harmonization required.",
+        "Awaiting manual-phase injection...",
+        "Modifier channels idle — awaiting combined elevation.",
+        "Phase B shows temporal imbalance.",
+        "Looking for mirrored trigger anomaly...",
+        "Manual override pattern not detected...",
+        "------------------------------------------------------",
+        "Idle state: system listening for paired-modifier impulse."
+    ];
+
+    let i = 0;
+    let interval = setInterval(() => {
+        box.innerHTML += lines[i] + "\n";
+        box.scrollTop = box.scrollHeight;
+        i++;
+
+        if (i >= lines.length) clearInterval(interval);
+    }, 170);
+}
+
+/* ------------------- CTRL + SHIFT --------------------- */
+let ctrl = false, shift = false, finalShown = false;
+
+window.addEventListener("keydown", (e) => {
+    if (e.key === "Control") ctrl = true;
+    if (e.key === "Shift") shift = true;
+
+    if (ctrl && shift && !finalShown) {
+        finalShown = true;
+        revealHiddenToken();
+    }
+});
+
+window.addEventListener("keyup", (e) => {
+    if (e.key === "Control") ctrl = false;
+    if (e.key === "Shift") shift = false;
+});
+
+/* ------------------- TOKEN REVEAL --------------------- */
+function revealHiddenToken() {
+    const box = document.getElementById("hackOutput");
+
+    box.innerHTML += "\n[Modifier-phase signal detected]\n";
+    box.innerHTML += "Rebalancing oscillators...\n";
+    box.innerHTML += "Extracting associated symbol stack...\n";
+    box.innerHTML += "----- Unindexed Symbols (Raw) -----\n\n";
+
+    const glyphs = ["@", "%", "#", "&", "$", "*"];
+    let idx = 0;
+
+    function showChar() {
+        if (idx < glyphs.length) {
+            let row = document.createElement("div");
+            row.innerHTML = `<span class='distortChar'>${glyphs[idx]}</span>`;
+            box.appendChild(row);
+            box.scrollTop = box.scrollHeight;
+            idx++;
+            setTimeout(showChar, 150);
+        } else {
+            box.innerHTML += "\n---------------------------------------\n";
+            setTimeout(() => proceedFinal(), 900);
+        }
+    }
+    showChar();
+}
+
+/* ------------------- FORCED FINAL POPUP --------------------- */
+function proceedFinal() {
+
+    // Encrypted version of IH2026, using your custom cipher:
+    // 2 = @
+    // 0 = )
+    // 6 = ^
+    let encrypted = "I H @ ) @ ^";
+
+    let msg =
+`Archival Notice:
+Reference segment ${encrypted} has been recorded in the unauthorized‑access audit log.
+
+Subsystems request immediate transition.`;
+
+    showForcedPopup(msg);
+}
+
+/* ------------------- CUSTOM FORCED POPUP --------------------- */
+function showForcedPopup(text) {
+    const popup = document.createElement("div");
+    popup.style.position = "fixed";
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%,-50%)";
+    popup.style.background = "black";
+    popup.style.border = "2px solid #00ff00";
+    popup.style.padding = "20px";
+    popup.style.zIndex = "999999";
+    popup.style.color = "#00ff00";
+    popup.style.width = "360px";
+    popup.style.textAlign = "center";
+    popup.style.whiteSpace = "pre-line";
+    popup.innerHTML = text;
+
+    let btn = document.createElement("button");
+    btn.innerText = "OK";
+    btn.style.marginTop = "15px";
+    btn.style.color = "#00ff00";
+    btn.style.background = "black";
+    btn.style.border = "1px solid #00ff00";
+    btn.style.padding = "6px";
+
+    btn.onclick = () => {
+        window.location.href = "portal.html?err=symbol-archive";
+    };
+
+    popup.appendChild(btn);
+    document.body.appendChild(popup);
+
+    // block all escape attempts
+    window.onkeydown = (e) => e.preventDefault();
+    window.onmousedown = (e) => e.preventDefault();
+    window.onmouseup = (e) => e.preventDefault();
+    window.oncontextmenu = (e) => e.preventDefault();
+}
+</script>
+
+</body>
+</html>
