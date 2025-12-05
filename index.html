@@ -95,7 +95,7 @@ body {
 }
 
 /* =========================================
-       MOBILE RESPONSIVE — NO OVERLAP
+       MOBILE RESPONSIVE — NO OVERLAP + Countdown inside circle
    ========================================= */
 @media (max-width: 768px) {
 
@@ -110,7 +110,6 @@ body {
   }
 
   #reactor-fill,
-  #countdown-container,
   #left-panel,
   #right-panel {
     position:relative !important;
@@ -129,13 +128,18 @@ body {
     max-height:380px !important;
   }
 
-  /* countdown above the circle, centered */
+  /* move countdown inside reactor */
   #countdown-container {
-    margin-top:10px;
+    position:absolute !important;
+    top:50% !important;
+    left:50% !important;
+    transform:translate(-50%, -50%) !important;
+    z-index:20 !important;
     text-align:center !important;
+    pointer-events:none;
   }
-  #countdown-label { font-size:6vw !important; }
-  #countdown { font-size:10vw !important; }
+  #countdown-label { font-size:4vw !important; }
+  #countdown { font-size:8vw !important; }
 
   /* stack panels under the circle */
   .side-panel {
