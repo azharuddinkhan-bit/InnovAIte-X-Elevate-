@@ -94,33 +94,36 @@ body {
   pointer-events:none;
 }
 
-/* MOBILE RESPONSIVE FIXES */
+/* =================================
+  MOBILE RESPONSIVE FIXES
+================================= */
 @media (max-width: 768px) {
 
-  #countdown-container {
-    top:50%;
-  }
-
-  #countdown-label { font-size:5vw; }
-  #countdown { font-size:8vw; }
-
-  /* Reactor smaller on mobile */
+  /* Reactor smaller and relative for countdown positioning */
   #reactor-fill {
     width:70vw;
     height:70vw;
     max-width:350px;
     max-height:350px;
+    position:relative; /* relative parent for countdown */
+    transform:none;
   }
 
-  /* Countdown inside circle */
+  /* Countdown inside reactor circle */
   #countdown-container {
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
+    z-index:20;
+    text-align:center;
+    pointer-events:none;
   }
 
-  /* stack the panels */
+  #countdown-label { font-size:5vw; }
+  #countdown { font-size:8vw; }
+
+  /* stack the panels under the circle */
   #left-panel,
   #right-panel {
     position:relative;
@@ -140,13 +143,16 @@ body {
 </head>
 <body>
 
-<canvas id="reactor-fill"></canvas>
-<canvas id="matrix-canvas"></canvas>
-
-<div id="countdown-container">
-  <div id="countdown-label">Event starts in:</div>
-  <div id="countdown">Loading...</div>
+<!-- Reactor container -->
+<div id="reactor-fill">
+  <canvas id="reactor-canvas"></canvas>
+  <div id="countdown-container">
+    <div id="countdown-label">Event starts in:</div>
+    <div id="countdown">Loading...</div>
+  </div>
 </div>
+
+<canvas id="matrix-canvas"></canvas>
 
 <div id="left-panel" class="side-panel">
   <div class="panel-title">[NODE ALPHA]</div>
@@ -161,7 +167,8 @@ body {
 <div class="scanlines"></div>
 
 <script>
-const canvas = document.getElementById("reactor-fill");
+// Canvas setup
+const canvas = document.getElementById("reactor-canvas");
 const ctx = canvas.getContext("2d");
 let cx=210, cy=210, radius=200;
 
@@ -176,7 +183,7 @@ function resizeCanvas(){
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-/* ------------------- ORIGINAL SCRIPT ------------------- */
+/* ------------------- Countdown & logs ------------------- */
 const fixedStartDate = new Date("2025-12-05T00:00:00");
 const targetDate = new Date("2026-01-06T00:00:00");
 const totalDuration = targetDate - fixedStartDate;
@@ -283,7 +290,7 @@ window.addEventListener("keydown", e=>{
   }
 });
 
-/* Stormy wave draw */
+/* Wave & Reactor drawing */
 let waveShift=0;
 const originalDrawWave=function(percent){
   let eased=easeOutCubic(draining?1-drainProgress:percent);
@@ -368,8 +375,8 @@ function draw(percent){
   ctx.restore();
 }
 
+/* Countdown update */
 const countdownEl=document.getElementById("countdown");
-const countdownContainer=document.getElementById("countdown-container");
 
 function update(){
   const now=new Date();
@@ -402,7 +409,7 @@ function update(){
       let m=Math.floor(s/60); s%=60;
       countdownEl.textContent=`${d}d ${h}h ${m}m ${s}s`;
     } else {
-      countdownContainer.remove();
+      document.getElementById("countdown-container").remove();
       document.querySelector("#left-panel .panel-title").textContent="[IDEATHON]";
       document.querySelector("#right-panel .panel-title").textContent="[HACKATHON]";
       clearInterval(log1._int);
