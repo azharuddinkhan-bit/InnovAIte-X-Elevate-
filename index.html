@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comming Soon</title>
+<title>Coming Soon</title>
 <style>
 body {
   margin:0; 
@@ -92,9 +92,9 @@ body {
 
 <script>
 /* ------------------- CONFIG + TIME SETUP ------------------- */
-const startDate = new Date();
-const targetDate = new Date("2026-01-06T00:00:00");  // Countdown until 6th Jan 2026
-const totalDuration = targetDate - startDate;
+const fixedStartDate = new Date("2025-12-05T00:00:00"); // Start date 5 Dec 2025
+const targetDate = new Date("2026-01-06T00:00:00");      // End date 6 Jan 2026
+const totalDuration = targetDate - fixedStartDate;       // total time from start to end
 
 const canvas = document.getElementById("reactor-fill");
 const ctx = canvas.getContext("2d");
@@ -205,7 +205,6 @@ window.addEventListener("keydown", e=>{
     draining=true;
     drainProgress=0;
 
-    // Fly out log panels
     log1.parentElement.style.transform = "translateX(-150vw) rotate(-30deg)";
     log2.parentElement.style.transform = "translateX(150vw) rotate(30deg)";
     log1.parentElement.style.opacity = 0;
@@ -354,7 +353,7 @@ function update(){
   let diff=targetDate-now;
   let percent=0;
   if(diff<=0){percent=1; countdownOver=true;}
-  else percent=1-(diff/totalDuration);
+  else percent=1 - Math.max(0, Math.min(1, diff / totalDuration)); // persistent fill
 
   if(draining){
     drainProgress+=0.003;
