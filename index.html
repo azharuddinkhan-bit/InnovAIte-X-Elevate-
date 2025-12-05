@@ -3,29 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Half Circle Wave with Gold Fireworks</title>
+<title>Comming Soon</title>
 <style>
-body {margin:0; height:100vh; background:black; overflow:hidden; font-family:"Courier New", monospace;}
-#countdown-container {position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; z-index:50; color:white;}
+body {
+  margin:0; 
+  height:100vh; 
+  background:black; 
+  overflow:hidden; 
+  font-family:"Courier New", monospace;
+}
+#countdown-container {
+  position:absolute; 
+  top:50%; 
+  left:50%; 
+  transform:translate(-50%, -50%); 
+  text-align:center; 
+  z-index:50; 
+  color:white;
+}
 #countdown-label { font-size:2rem; margin-bottom:0.3rem; }
 #countdown { font-size:3rem; font-weight:bold; color:white; text-shadow:0 0 10px #00ff00,0 0 20px #00ff00; }
 
-#reactor-fill { position:absolute; top:50%; left:50%; width:420px; height:420px; transform:translate(-50%, -50%); z-index:6; border-radius:50%; overflow:hidden; }
+#reactor-fill { 
+  position:absolute; 
+  top:50%; 
+  left:50%; 
+  width:420px; 
+  height:420px; 
+  transform:translate(-50%, -50%); 
+  z-index:6; 
+  border-radius:50%; 
+  overflow:hidden; 
+}
 
-.side-panel { position:absolute; top:50%; width:280px; padding:20px; background:rgba(0,0,0,0.3);
-  border:1px solid #00ffbf; backdrop-filter:blur(4px); transform:translateY(-50%);
-  box-shadow:0 0 22px rgba(0,255,180,0.25); z-index:3; }
-#left-panel{left:40px;} #right-panel{right:40px;}
+.side-panel { 
+  position:absolute; 
+  top:50%; 
+  width:280px; 
+  padding:20px; 
+  background:rgba(0,0,0,0.3);
+  border:2px solid #00ffbf; 
+  backdrop-filter:blur(4px); 
+  transform:translateY(-50%);
+  box-shadow:0 0 22px rgba(0,255,180,0.25); 
+  z-index:3; 
+  transition: all 2s ease-in;
+}
+#left-panel{ left:40px; border-color:gold; }
+#right-panel{ right:40px; border-color:#1B5287; }
 .panel-title { color:#00ffe0; margin-bottom:10px; }
-.panel-log { height:180px; overflow:hidden; opacity:0.85; color:#00ffb5; }
+.panel-log { height:180px; overflow:hidden; opacity:0.85; color:#00ffb5; position:relative; }
 
-.scanlines { position:fixed; top:0; left:0; right:0; bottom:0; pointer-events:none;
+.scanlines { 
+  position:fixed; 
+  top:0; left:0; right:0; bottom:0; pointer-events:none;
   background:repeating-linear-gradient(transparent 0px, transparent 2px, rgba(0,255,170,0.03) 3px);
-  z-index:999; }
+  z-index:999; 
+}
+
+#matrix-canvas{
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  z-index:1000;
+  pointer-events:none;
+}
 </style>
 </head>
 <body>
 <canvas id="reactor-fill"></canvas>
+<canvas id="matrix-canvas"></canvas>
 
 <div id="countdown-container">
   <div id="countdown-label">Event starts in:</div>
@@ -44,227 +91,309 @@ body {margin:0; height:100vh; background:black; overflow:hidden; font-family:"Co
 <div class="scanlines"></div>
 
 <script>
-// Countdown target: from now until 6th Jan 2026
-const targetDate = new Date("2026-01-06T00:00:00");
-
-const countdownContainer = document.getElementById("countdown-container");
-const countdownEl = document.getElementById("countdown");
+/* ------------------- CONFIG + TIME SETUP ------------------- */
+const startDate = new Date();
+const targetDate = new Date("2026-01-06T00:00:00");  // Countdown until 6th Jan 2026
+const totalDuration = targetDate - startDate;
 
 const canvas = document.getElementById("reactor-fill");
 const ctx = canvas.getContext("2d");
-canvas.width = 420; canvas.height = 420;
-const cx = 210, cy = 210, radius = 210;
+canvas.width = 420;
+canvas.height = 420;
+const cx=210, cy=210, radius=200;
 
-const log1 = document.getElementById("log1");
-const log2 = document.getElementById("log2");
-
-// Function to cycle logs
-function cycleLogs(el, lines) {
+/* ------------------- LOG PANELS ------------------- */
+function cycleLogs(el, lines){
   let i=0;
-  el._int = setInterval(()=>{
+  el._int = setInterval(()=> {
     el.innerHTML += "> "+lines[i]+"<br>";
-    if(el.innerHTML.split("<br>").length>8) el.innerHTML = el.innerHTML.split("<br>").slice(1).join("<br>");
+    if(el.innerHTML.split("<br>").length>8)
+      el.innerHTML = el.innerHTML.split("<br>").slice(1).join("<br>");
     i = (i+1)%lines.length;
   },1500);
 }
 
-// Initial logs before countdown
-cycleLogs(log1, [
-  "Initializing node systems... some paths arrowUp hidden",
+const log1 = document.getElementById("log1");
+const log2 = document.getElementById("log2");
+
+const alphaLogs = [
+  "Initializing node systems... some paths are",
   "Analyzing streams... telemetry stable",
   "Telemetry anomaly: ↑ detected in sector 3",
   "Preparing core modules... sync in progress",
-  "Syncing virtual interfaces... arrowDown observed",
+  "Syncing virtual interfaces... observed",
   "Telemetry anomaly: ↑ spike",
   "Analyzing packets... system stable",
-  "Telemetry anomaly:> check arrowRight channel"
-]);
-cycleLogs(log2, [
-  "Monitoring sequences... arrowLeft subtle hint",
-  "Transmission nominal...",
+  "Telemetry anomaly:> check channel >"
+];
+
+const omegaLogs = [
+  "Monitoring sequences... 7810892",
+  "Transmission nominal...10-10",
   "Telemetry anomaly:↓ detected",
   "Analyzing packets... ↓..normal",
-  "Syncing virtual interfaces... arrowUp activity",
+  "Syncing virtual interfaces...activity",
   "Telemetry anomaly:< observed",
   "Preparing core modules...",
   "Enter command sequence if needed"
-]);
+];
 
-let waveShift = 0;
-let countdownOver = false;
+cycleLogs(log1, alphaLogs);
+cycleLogs(log2, omegaLogs);
 
-// Fireworks particles along ring
-let fireworks = [];
-function createFireworks(percent){
-  const angle = Math.random()*Math.PI*2;
-  const r = radius - 3;
-  const fx = cx + r*Math.cos(angle);
-  const fy = cy + r*Math.sin(angle);
-  fireworks.push({x:fx, y:fy, alpha:1, size:2+Math.random()*2, decay:0.02+Math.random()*0.02});
+const ideathonLogs = [
+  "Project Alpha phase started",
+  "Analyzing user feedback...",
+  "Integrating hack modules...",
+  "Compiling core ideathon routines...",
+  "Telemetry stable... proceeding ups",
+  ">Deploying interface nodes...<",
+  "Finalizing ideathon sequence..."
+];
+
+const hackathonLogs = [
+  "Hackathon Node X initiated",
+  "Data streams aligned...",
+  "Analyzing algorithmic patterns...",
+  "Syncing virtual interfaces with downers...",
+  "Compiling challenge response...",
+  ">Deploying hackathon modules...<",
+  "Final checks complete to enter..."
+];
+
+/* ------------------- EASING FUNCTION ------------------- */
+function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+
+/* ------------------- STATE ------------------- */
+let countdownOver=false;
+let draining=false;
+let drainProgress=0;
+let seq=[];
+const konami=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowRight","ArrowLeft","Enter"];
+
+/* ------------------- MATRIX RAIN ------------------- */
+let matrixActive=false;
+const matrixCanvas = document.getElementById("matrix-canvas");
+const mctx = matrixCanvas.getContext("2d");
+matrixCanvas.width = window.innerWidth;
+matrixCanvas.height = window.innerHeight;
+const fontSize = 18;
+const columns = Math.floor(matrixCanvas.width / fontSize);
+const drops = Array(columns).fill(1);
+
+function drawMatrix(){
+  if(!matrixActive) return;
+  mctx.fillStyle = "rgba(0,0,0,0.05)";
+  mctx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height);
+  mctx.fillStyle = "#0F0";
+  mctx.font = fontSize + "px monospace";
+  for(let i=0;i<columns;i++){
+    const text = String.fromCharCode(33 + Math.floor(Math.random()*94));
+    mctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize > matrixCanvas.height && Math.random() > 0.975) drops[i]=0;
+    drops[i]++;
+  }
+  requestAnimationFrame(drawMatrix);
 }
 
-function drawHalfCircle(percent){
-  ctx.clearRect(0,0,420,420);
+/* ------------------- KONAMI HANDLER ------------------- */
+window.addEventListener("keydown", e=>{
+  seq.push(e.key);
+  if(seq.length>konami.length) seq.shift();
+  if(JSON.stringify(seq)===JSON.stringify(konami)){
+    alert("ERROR: Unauthorized access attempt detected.\nSystem will now restart...");
+    draining=true;
+    drainProgress=0;
+
+    // Fly out log panels
+    log1.parentElement.style.transform = "translateX(-150vw) rotate(-30deg)";
+    log2.parentElement.style.transform = "translateX(150vw) rotate(30deg)";
+    log1.parentElement.style.opacity = 0;
+    log2.parentElement.style.opacity = 0;
+  }
+});
+
+/* ------------------- DRAW FUNCTIONS ------------------- */
+let waveShift=0;
+const originalDrawWave = function(percent){
+  let eased=easeOutCubic(draining ? 1 - drainProgress : percent);
+  const waves=[
+    {amp:12, wl:110, sp:0.05},
+    {amp:8, wl:80, sp:0.07},
+    {amp:6, wl:60, sp:0.04},
+    {amp:4, wl:30, sp:0.1}
+  ];
+  const halfH=canvas.height/2;
+  const fillH=halfH*eased;
+  const color = countdownOver ? "#FFD700" : "#1B5287"; 
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  for(let x=0;x<=canvas.width;x++){
+    let y=canvas.height-fillH;
+    waves.forEach(w=>{y+=Math.sin(x/w.wl + waveShift*w.sp)*w.amp;});
+    if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.lineTo(canvas.width,canvas.height);
+  ctx.lineTo(0,canvas.height);
+  ctx.fill();
+}
+
+function drawRings(){
+  ctx.strokeStyle="rgba(255,255,255,0.05)";
+  ctx.lineWidth=1;
+  for(let r=20;r<=radius;r+=20){
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,2*Math.PI);
+    ctx.stroke();
+  }
+}
+
+function drawArc(percent){
+  const startAngle=-Math.PI/2;
+  const phaseTime=0.25;
+  let phase=Math.min(Math.floor(percent/phaseTime),3);
+  let localPercent=(percent - phase*phaseTime)/phaseTime;
+
+  let blueStart=0, blueEnd=0, goldStart=0, goldEnd=0;
+
+  if(phase===0){ 
+    blueEnd=localPercent; goldEnd=0;
+  } else if(phase===1){ 
+    blueEnd=1; goldStart=1; goldEnd=1-localPercent;
+  } else if(phase===2){ 
+    goldEnd=1; blueEnd=localPercent;
+  } else if(phase===3){ 
+    blueEnd=1; goldStart=1; goldEnd=1-localPercent;
+  }
+
+  if(draining){
+    blueEnd=0;
+    goldStart=0;
+    goldEnd=1-drainProgress;
+  }
+
+  if(phase===1 || phase===3 || draining){
+    if(blueEnd>0){
+      ctx.beginPath();
+      ctx.strokeStyle="blue";
+      ctx.shadowColor="blue";
+      ctx.shadowBlur=20;
+      ctx.lineWidth=8;
+      ctx.arc(cx,cy,radius,startAngle,startAngle + blueEnd*2*Math.PI);
+      ctx.stroke();
+    }
+    if(goldEnd>0){
+      ctx.beginPath();
+      ctx.strokeStyle="gold";
+      ctx.shadowColor="gold";
+      ctx.shadowBlur=20;
+      ctx.lineWidth=8;
+      ctx.arc(cx,cy,radius,startAngle + goldEnd*2*Math.PI,startAngle + goldStart*2*Math.PI);
+      ctx.stroke();
+    }
+  } else {
+    if(goldEnd>0){
+      ctx.beginPath();
+      ctx.strokeStyle="gold";
+      ctx.shadowColor="gold";
+      ctx.shadowBlur=20;
+      ctx.lineWidth=8;
+      ctx.arc(cx,cy,radius,startAngle + goldEnd*2*Math.PI,startAngle + goldStart*2*Math.PI);
+      ctx.stroke();
+    }
+    if(blueEnd>0){
+      ctx.beginPath();
+      ctx.strokeStyle="blue";
+      ctx.shadowColor="blue";
+      ctx.shadowBlur=20;
+      ctx.lineWidth=8;
+      ctx.arc(cx,cy,radius,startAngle,startAngle + blueEnd*2*Math.PI);
+      ctx.stroke();
+    }
+  }
+
+  ctx.shadowBlur=0;
+}
+
+function drawElevate(){
+  ctx.fillStyle = "#ffffff";
+  ctx.font="bold 60px Courier New";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.shadowColor = "#ffffff";
+  ctx.shadowBlur = 20;
+  ctx.fillText("ELEVATE", cx, cy);
+}
+
+function draw(percent){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx,cy,radius,0,Math.PI*2);
   ctx.clip();
 
-  waveShift += 0.06;
-  const waves = [
-    {amp:12, wl:110, sp:0.05},
-    {amp:8, wl:80, sp:0.07},
-    {amp:6, wl:60, sp:0.04},
-    {amp:4, wl:30, sp:0.1},
-  ];
+  waveShift+=0.06;
 
-  const halfCircle = canvas.height / 2;
+  originalDrawWave(percent);
+  drawRings();
+  drawArc(percent);
 
-  // Subtle concentric circle lines
-  ctx.strokeStyle = "rgba(255,255,255,0.05)";
-  ctx.lineWidth = 1;
-  for(let rStep=20; rStep<=radius; rStep+=20){
-    ctx.beginPath();
-    ctx.arc(cx, cy, rStep, 0, Math.PI*2);
-    ctx.stroke();
-  }
-
-  if(!countdownOver){
-    // Bottom-up blue wave
-    const fillH = halfCircle * percent;
-    ctx.fillStyle="#1B5287";
-    ctx.beginPath();
-    for(let x=0;x<=canvas.width;x++){
-      let y = canvas.height - fillH;
-      waves.forEach(w=> y += Math.sin(x/w.wl + waveShift*w.sp)*w.amp);
-      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.lineTo(canvas.width,canvas.height);
-    ctx.lineTo(0,canvas.height);
-    ctx.fill();
-
-    // Gold ring with subtle firework effect
-    const ringAngle = -Math.PI/2 + 2*Math.PI*percent;
-    ctx.strokeStyle="gold";
-    ctx.lineWidth=6;
-    ctx.beginPath();
-    ctx.arc(cx,cy,radius-3,-Math.PI/2, ringAngle);
-    ctx.stroke();
-
-    if(Math.random()<0.03) createFireworks(percent);
-
-  } else {
-    // Blue wave stays
-    ctx.fillStyle="#1B5287";
-    ctx.beginPath();
-    for(let x=0;x<=canvas.width;x++){
-      let y = canvas.height - halfCircle;
-      waves.forEach(w=> y += Math.sin(x/w.wl + waveShift*w.sp)*w.amp);
-      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.lineTo(canvas.width,canvas.height);
-    ctx.lineTo(0,canvas.height);
-    ctx.fill();
-
-    // Full gold ring
-    ctx.strokeStyle = "gold";
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.arc(cx,cy,radius-3,0,2*Math.PI);
-    ctx.stroke();
-
-    // Fireworks
-    fireworks.forEach(f=>{
-      ctx.globalAlpha = f.alpha;
-      ctx.fillStyle="gold";
-      ctx.beginPath();
-      ctx.arc(f.x,f.y,f.size,0,Math.PI*2);
-      ctx.fill();
-      f.alpha -= f.decay;
-    });
-    fireworks = fireworks.filter(f=>f.alpha>0);
-    ctx.globalAlpha = 1;
-
-    // Center glowing ELEVATE
-    const glowColors = ["#ffffff","#ffec00"];
-    const glowIndex = Math.floor(Date.now()/300)%2;
-    ctx.fillStyle = glowColors[glowIndex];
-    ctx.font="bold 60px Courier New";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.shadowColor = glowColors[glowIndex];
-    ctx.shadowBlur = 20;
-    ctx.fillText("ELEVATE", cx, cy);
-  }
+  if(percent>=1 && !draining) drawElevate();
 
   ctx.restore();
 }
 
-// Countdown and wave loop
+/* ------------------- MAIN LOOP ------------------- */
+const countdownEl=document.getElementById("countdown");
+const countdownContainer=document.getElementById("countdown-container");
+const leftPanel=document.getElementById("left-panel");
+const rightPanel=document.getElementById("right-panel");
+
 function update(){
-  const now = new Date();
-  const diff = targetDate - now;
+  const now=new Date();
+  let diff=targetDate-now;
+  let percent=0;
+  if(diff<=0){percent=1; countdownOver=true;}
+  else percent=1-(diff/totalDuration);
 
-  let percent = 0;
-  if(diff <= 0){
-    percent = 1;
-    countdownOver = true;
-  } else {
-    percent = 1 - (diff/targetDate.getTime());
+  if(draining){
+    drainProgress+=0.003;
+    percent=Math.max(0,1-drainProgress);
+
+    if(drainProgress>=1 && !matrixActive){
+      matrixActive=true;
+      drawMatrix();
+
+      setTimeout(()=>{
+        document.body.style.transition = "transform 2s ease-in";
+        document.body.style.transform = "translateY(-100vh)";
+        setTimeout(()=>{ window.location.href="portal.html"; }, 2000);
+      }, 500);
+    }
   }
 
-  drawHalfCircle(percent);
+  draw(percent);
 
-  if(diff > 0){
-    const days = Math.floor(diff/(1000*60*60*24));
-    const hours = Math.floor((diff/(1000*60*60))%24);
-    const mins = Math.floor((diff/1000/60)%60);
-    const secs = Math.floor((diff/1000)%60);
-    countdownEl.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
-    requestAnimationFrame(update);
-  } else {
-    countdownContainer.remove();
-    clearInterval(log1._int);
-    clearInterval(log2._int);
-
-    // After countdown, change titles and show new logs
-    document.querySelector("#left-panel .panel-title").textContent = "IDEATHON";
-    document.querySelector("#right-panel .panel-title").textContent = "HACKATHON";
-
-    cycleLogs(log1, [
-      "Ideathon Start: 12-Jan-2026",
-      "Ideathon End: 30-Jan-2026",
-      "Collaborate. Brainstorm. Innovate.",
-      "Node sync complete.",
-      "Analytics module active.",
-      "Design. Code. Create.",
-      "ArrowUp hints hidden in paths"
-    ]);
-    cycleLogs(log2, [
-      "Hackathon Start: 19-Feb-2026",
-      "Hackathon End: 23-Feb-2026",
-      "Build. Solve. Create.",
-      "Server latency optimal.",
-      "Packet transmission stable.",
-      "Test. Debug. Deploy.",
-      "ArrowDown hidden subtly"
-    ]);
-
-    requestAnimationFrame(update); // keep waves moving
+  if(!draining){
+    if(diff>0){
+      let s=Math.floor(diff/1000);
+      let d=Math.floor(s/86400); s%=86400;
+      let h=Math.floor(s/3600); s%=3600;
+      let m=Math.floor(s/60); s%=60;
+      countdownEl.textContent=`${d}d ${h}h ${m}m ${s}s`;
+    } else { 
+      countdownContainer.remove();
+      leftPanel.querySelector(".panel-title").textContent="[IDEATHON]";
+      rightPanel.querySelector(".panel-title").textContent="[HACKATHON]";
+      clearInterval(log1._int);
+      clearInterval(log2._int);
+      cycleLogs(log1, ideathonLogs);
+      cycleLogs(log2, hackathonLogs);
+    }
   }
+
+  requestAnimationFrame(update);
 }
-
-// Konami code redirect
-let seq=[];
-const target=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowRight","ArrowLeft","Enter"];
-window.addEventListener("keydown",e=>{
-  seq.push(e.key);
-  if(seq.length>target.length) seq.shift();
-  if(JSON.stringify(seq)==JSON.stringify(target)){
-    alert("ERROR: Unauthorized access attempt detected.\nRedirecting...");
-    window.location.href="portal.html";
-  }
-});
 
 update();
 </script>
