@@ -95,7 +95,7 @@ body {
 }
 
 /* =========================================
-       MOBILE RESPONSIVE — CENTER COUNTDOWN
+       MOBILE RESPONSIVE — NO OVERLAP
    ========================================= */
 @media (max-width: 768px) {
 
@@ -109,45 +109,41 @@ body {
     gap:25px;
   }
 
-  /* Reactor becomes flex container for countdown */
-  #reactor-fill {
-    position:relative !important;
-    display:flex !important;
-    justify-content:center !important;
-    align-items:center !important;
-    width:80vw !important;
-    height:80vw !important;
-    max-width:380px !important;
-    max-height:380px !important;
-    top:auto !important;
-    left:auto !important;
-    transform:none !important;
-  }
-
-  /* Countdown inside reactor */
-  #countdown-container {
-    position:absolute !important;
-    top:50% !important;
-    left:50% !important;
-    transform:translate(-50%,-50%) !important;
-    text-align:center !important;
-    z-index:10;
-  }
-
-  #countdown-label { font-size:6vw !important; }
-  #countdown { font-size:10vw !important; }
-
-  /* stack panels under the circle */
-  #left-panel, #right-panel {
+  #reactor-fill,
+  #countdown-container,
+  #left-panel,
+  #right-panel {
     position:relative !important;
     top:auto !important;
     left:auto !important;
     right:auto !important;
     transform:none !important;
+    margin:0 auto !important;
+  }
+
+  /* reactor size comfortable for mobile */
+  #reactor-fill {
+    width:80vw !important;
+    height:80vw !important;
+    max-width:380px !important;
+    max-height:380px !important;
+  }
+
+  /* countdown above the circle, centered */
+  #countdown-container {
+    margin-top:10px;
+    text-align:center !important;
+  }
+  #countdown-label { font-size:6vw !important; }
+  #countdown { font-size:10vw !important; }
+
+  /* stack panels under the circle */
+  .side-panel {
     width:90vw !important;
     max-width:380px !important;
     height:auto !important;
     margin-top:20px;
+    transform:none !important;
   }
 
   .panel-title {
@@ -160,7 +156,7 @@ body {
     font-size:3.8vw !important;
   }
 
-  /* matrix covers whole page correctly */
+  /* matrix covers whole page and scrolls correctly */
   #matrix-canvas {
     position:fixed !important;
     top:0 !important;
@@ -198,11 +194,14 @@ body {
 /* ------------------- FIXED CANVAS RESPONSIVE SIZE ------------------- */
 const canvas = document.getElementById("reactor-fill");
 const ctx = canvas.getContext("2d");
+
 let cx=210, cy=210, radius=200;
+
 function resizeCanvas(){
   const size = canvas.clientWidth;
   canvas.width = size;
   canvas.height = size;
+
   cx = size / 2;
   cy = size / 2;
   radius = size / 2 - 10;
@@ -211,10 +210,12 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 /* ------------------- ORIGINAL SCRIPT (UNCHANGED FUNCTIONALITY) ------------------- */
+
 const fixedStartDate = new Date("2025-12-05T00:00:00");
 const targetDate = new Date("2026-01-06T00:00:00");
 const totalDuration = targetDate - fixedStartDate;
 
+/* logs */
 function cycleLogs(el, lines){
   let i=0;
   el._int = setInterval(()=>{
@@ -248,6 +249,7 @@ const omegaLogs = [
   "Preparing core modules...",
   "Enter command sequence if needed"
 ];
+
 cycleLogs(log1, alphaLogs);
 cycleLogs(log2, omegaLogs);
 
@@ -270,13 +272,17 @@ const hackathonLogs = [
   "Final checks complete to enter..."
 ];
 
+/* easing */
 function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
+
+/* state */
 let countdownOver=false;
 let draining=false;
 let drainProgress=0;
 let seq=[];
 const konami=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowRight","ArrowLeft","Enter"];
 
+/* MATRIX */
 let matrixActive=false;
 const matrixCanvas=document.getElementById("matrix-canvas");
 const mctx=matrixCanvas.getContext("2d");
@@ -292,6 +298,7 @@ function drawMatrix(){
   mctx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height);
   mctx.fillStyle="#0F0";
   mctx.font=fontSize+"px monospace";
+
   for(let i=0;i<columns;i++){
     const text=String.fromCharCode(33+Math.floor(Math.random()*94));
     mctx.fillText(text,i*fontSize,drops[i]*fontSize);
@@ -301,13 +308,16 @@ function drawMatrix(){
   requestAnimationFrame(drawMatrix);
 }
 
+/* KONAMI CODE */
 window.addEventListener("keydown", e=>{
   seq.push(e.key);
   if(seq.length>konami.length) seq.shift();
+
   if(JSON.stringify(seq)===JSON.stringify(konami)){
     alert("ERROR: Unauthorized access attempt detected.\nSystem will now restart...");
     draining=true;
     drainProgress=0;
+
     log1.parentElement.style.transform="translateX(-150vw) rotate(-30deg)";
     log2.parentElement.style.transform="translateX(150vw) rotate(30deg)";
     log1.parentElement.style.opacity=0;
@@ -315,14 +325,22 @@ window.addEventListener("keydown", e=>{
   }
 });
 
+/* DRAW */
 let waveShift=0;
+
 const originalDrawWave=function(percent){
   let eased=easeOutCubic(draining ? 1-drainProgress : percent);
-  const waves=[{amp:12, wl:110, sp:0.05},{amp:8, wl:80, sp:0.07},{amp:6, wl:60, sp:0.04},{amp:4, wl:30, sp:0.1}];
+  const waves=[
+    {amp:12, wl:110, sp:0.05},
+    {amp:8, wl:80, sp:0.07},
+    {amp:6, wl:60, sp:0.04},
+    {amp:4, wl:30, sp:0.1}
+  ];
   const halfH=canvas.height/2;
   const fillH=halfH*eased;
   const color = countdownOver ? "#FFD700" : "#1B5287";
   ctx.fillStyle=color;
+
   ctx.beginPath();
   for(let x=0;x<=canvas.width;x++){
     let y=canvas.height-fillH;
@@ -346,15 +364,24 @@ function drawRings(){
 
 function drawArc(percent){
   const startAngle=-Math.PI/2;
+
   const phaseTime=0.25;
   let phase=Math.min(Math.floor(percent/phaseTime),3);
   let localPercent=(percent-phase*phaseTime)/phaseTime;
+
   let blueEnd=0,goldStart=0,goldEnd=0;
+
   if(phase===0){ blueEnd=localPercent; }
   else if(phase===1){ blueEnd=1; goldStart=1; goldEnd=1-localPercent; }
   else if(phase===2){ goldEnd=1; blueEnd=localPercent; }
   else if(phase===3){ blueEnd=1; goldStart=1; goldEnd=1-localPercent; }
-  if(draining){ blueEnd=0; goldStart=0; goldEnd=1-drainProgress; }
+
+  if(draining){
+    blueEnd=0;
+    goldStart=0;
+    goldEnd=1-drainProgress;
+  }
+
   function arc(color,start,end){
     if(end<=0) return;
     ctx.beginPath();
@@ -365,8 +392,10 @@ function drawArc(percent){
     ctx.arc(cx,cy,radius,startAngle + start*2*Math.PI, startAngle + end*2*Math.PI);
     ctx.stroke();
   }
+
   arc("gold", goldEnd, goldStart);
   arc("blue", 0, blueEnd);
+
   ctx.shadowBlur=0;
 }
 
@@ -382,32 +411,47 @@ function drawElevate(){
 
 function draw(percent){
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx,cy,radius,0,2*Math.PI);
   ctx.clip();
+
   waveShift+=0.06;
+
   originalDrawWave(percent);
   drawRings();
   drawArc(percent);
+
   if(percent>=1 && !draining) drawElevate();
+
   ctx.restore();
 }
 
+/* MAIN LOOP */
 const countdownEl=document.getElementById("countdown");
+const countdownContainer=document.getElementById("countdown-container");
+
 function update(){
   const now=new Date();
   let diff=targetDate-now;
   let percent=0;
-  if(diff<=0){ percent=1; countdownOver=true; }
-  else percent=1-Math.max(0,Math.min(1,diff/totalDuration));
+
+  if(diff<=0){
+    percent=1;
+    countdownOver=true;
+  } else {
+    percent=1 - Math.max(0, Math.min(1, diff / totalDuration));
+  }
 
   if(draining){
     drainProgress+=0.003;
     percent=Math.max(0,1-drainProgress);
+
     if(drainProgress>=1 && !matrixActive){
       matrixActive=true;
       drawMatrix();
+
       setTimeout(()=>{
         document.body.style.transition="transform 2s ease-in";
         document.body.style.transform="translateY(-100vh)";
@@ -426,7 +470,7 @@ function update(){
       let m=Math.floor(s/60); s%=60;
       countdownEl.textContent=`${d}d ${h}h ${m}m ${s}s`;
     } else {
-      document.getElementById("countdown-container").remove();
+      countdownContainer.remove();
       document.querySelector("#left-panel .panel-title").textContent="[IDEATHON]";
       document.querySelector("#right-panel .panel-title").textContent="[HACKATHON]";
       clearInterval(log1._int);
@@ -441,5 +485,6 @@ function update(){
 
 update();
 </script>
+
 </body>
 </html>
