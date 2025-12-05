@@ -5,14 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dynamic Hacker Terminal Puzzle</title>
 <style>
-body { margin:0; background:black; color:#00ff00; font-family:"Courier New", monospace; overflow:hidden; display:flex; }
-#keylogBox { width:260px; border-right:1px solid #00ff00; padding:10px; height:100vh; overflow-y:auto; background:rgba(0,0,0,0.4);}
-#terminal { padding:20px; flex-grow:1; height:100vh; overflow-y:auto;}
-input, button { background:black; color:#00ff00; border:1px solid #00ff00; padding:6px; font-family:monospace;}
-#hackOutput { display:none; margin-top:20px; border:1px solid #00ff00; padding:10px; height:350px; overflow-y:auto; white-space:pre-line; background:rgba(0,0,0,0.6);}
-#crt { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999;
-background:repeating-linear-gradient(to bottom, rgba(0,255,0,0.08), rgba(0,255,0,0.08) 3px, rgba(0,255,0,0.02) 4px); 
-animation: crtPulse 0.25s infinite;}
+body { 
+    margin:0; 
+    background:black; 
+    color:#FFB700; /* text color changed */ 
+    font-family:"Courier New", monospace; 
+    overflow:hidden; 
+    display:flex; 
+}
+#keylogBox { 
+    width:260px; 
+    border-right:1px solid #1B5287; /* outline color changed */ 
+    padding:10px; 
+    height:100vh; 
+    overflow-y:auto; 
+    background:rgba(0,0,0,0.4);
+    color:#FFB700; /* text color changed */
+}
+#terminal { 
+    padding:20px; 
+    flex-grow:1; 
+    height:100vh; 
+    overflow-y:auto;
+    color:#FFB700; /* text color changed */
+}
+input, button { 
+    background:black; 
+    color:#FFB700; /* text color changed */
+    border:1px solid #1B5287; /* outline color changed */
+    padding:6px; 
+    font-family:monospace;
+}
+#hackOutput { 
+    display:none; 
+    margin-top:20px; 
+    border:1px solid #1B5287; /* outline color changed */
+    padding:10px; 
+    height:350px; 
+    overflow-y:auto; 
+    white-space:pre-line; 
+    background:rgba(0,0,0,0.6);
+    color:#FFB700; /* text color changed */
+}
+#crt { 
+    position:fixed; 
+    top:0; 
+    left:0; 
+    width:100%; 
+    height:100%; 
+    pointer-events:none; 
+    z-index:9999;
+    background:repeating-linear-gradient(to bottom, rgba(27,82,135,0.08), rgba(27,82,135,0.08) 3px, rgba(27,82,135,0.02) 4px); /* CRT scanline color changed */
+    animation: crtPulse 0.25s infinite;
+}
 @keyframes crtPulse {0%{opacity:0.18}50%{opacity:0.23}100%{opacity:0.18}}
 @keyframes shake {0%{transform:translateX(0px)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}100%{transform:translateX(0px)}}
 .errorShake { animation: shake 0.25s;}
@@ -35,7 +80,10 @@ animation: crtPulse 0.25s infinite;}
 <script>
 //------------------ KEYLOGGER ------------------
 let keylog=document.getElementById("keylog");
-window.addEventListener("keydown",e=>{ keylog.textContent+=`[${new Date().toLocaleTimeString()}] ${e.key}\n`; keylog.scrollTop=keylog.scrollHeight;});
+window.addEventListener("keydown",e=>{ 
+    keylog.textContent+=`[${new Date().toLocaleTimeString()}] ${e.key}\n`; 
+    keylog.scrollTop=keylog.scrollHeight;
+});
 
 //------------------ RANDOM HELPERS ------------------
 function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
@@ -63,31 +111,25 @@ function generateExpression(level){
     switch(level){
         case 1:
             let V1=rand(10,20);
-            expr = `V1 ${pick(ops)} ${V1} = ? (V1=${V1})`;
-            result = eval(`${V1}*2 + N1`);
+            result = V1*2 + N1;
             return {expr:`LEVEL 1 — Structural Offset\n----------------------------------------\nV1*2 + N1 = ${result}\nV1=${V1}\nSolve for N1:`, answer:N1};
         case 2:
             let a2=rand(2,5);
-            expr = `N1*${a2} + N2 = ?`;
             result = N1*a2 + N2;
             return {expr:`LEVEL 2 — Load Factor Alignment\n----------------------------------------\nN1*${a2} + N2 = ${result}\nSolve for N2:`, answer:N2};
         case 3:
             let a3=rand(2,6);
-            expr = `(N1+N2)*${a3} - N3 = ?`;
             result = (N1+N2)*a3 - N3;
             return {expr:`LEVEL 3 — Sequence Flux Stabilization\n----------------------------------------\n(N1+N2)*${a3} - N3 = ${result}\nSolve for N3:`, answer:N3};
         case 4:
             let a4=rand(1,3), b4=rand(1,3), c4=rand(1,3);
-            expr = `N1*${a4} + N2*${b4} + N3*${c4} + N4 = ?`;
             result = N1*a4 + N2*b4 + N3*c4 + N4;
             return {expr:`LEVEL 4 — Harmonic Expansion\n----------------------------------------\n(N1*${a4} + N2*${b4} + N3*${c4}) + N4 = ${result}\nSolve for N4:`, answer:N4};
         case 5:
             let a5=rand(2,4);
-            expr = `(N1+N2+N3)*${a5} + N4 - N5 = ?`;
             result = (N1+N2+N3)*a5 + N4 - N5;
             return {expr:`LEVEL 5 — Stabilizer Core Equation\n----------------------------------------\n((N1+N2+N3)*${a5} + N4) - N5 = ${result}\nSolve for N5:`, answer:N5};
         case 6:
-            expr = `N1 + N2 + N3 + N4 + N5 = ?`;
             result = N1+N2+N3+N4+N5;
             return {expr:`FINAL RECONSTRUCTION\n----------------------------------------\nN1 + N2 + N3 + N4 + N5 = ?\nEnter FINAL KEY:`, answer:result};
     }
@@ -183,10 +225,10 @@ Subsystems request immediate transition.`;
     popup.style.left="50%";
     popup.style.transform="translate(-50%,-50%)";
     popup.style.background="black";
-    popup.style.border="2px solid #00ff00";
+    popup.style.border="2px solid #1B5287"; // outline changed
     popup.style.padding="20px";
     popup.style.zIndex="999999";
-    popup.style.color="#00ff00";
+    popup.style.color="#FFB700"; // text color changed
     popup.style.width="420px";
     popup.style.textAlign="center";
     popup.style.whiteSpace="pre-line";
@@ -195,9 +237,9 @@ Subsystems request immediate transition.`;
     const btn=document.createElement("button");
     btn.innerText="OK";
     btn.style.marginTop="15px";
-    btn.style.color="#00ff00";
+    btn.style.color="#FFB700"; // text color changed
     btn.style.background="black";
-    btn.style.border="1px solid #00ff00";
+    btn.style.border="1px solid #1B5287"; // outline changed
     btn.style.padding="6px";
     btn.onclick=()=> { window.location.href="portal.html?err=symbol-archive"; };
 
