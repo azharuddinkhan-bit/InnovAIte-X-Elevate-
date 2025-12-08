@@ -14,7 +14,7 @@ body {
   font-family:"Courier New", monospace;
 }
 
-/* COUNTDOWN — REDUCED TO FIT INSIDE CIRCLE */
+/* COUNTDOWN */
 #countdown-container {
   position:absolute;
   top:50%;
@@ -24,14 +24,9 @@ body {
   z-index:50;
   color:white;
 }
-
-#countdown-label {
-  font-size:1.4rem !important;  /* reduced */
-  margin-bottom:0.3rem;
-}
-
+#countdown-label { font-size:2rem; margin-bottom:0.3rem; }
 #countdown {
-  font-size:2.2rem !important;  /* reduced */
+  font-size:3rem;
   font-weight:bold;
   color:white;
   text-shadow:0 0 10px #00ff00,0 0 20px #00ff00;
@@ -66,7 +61,6 @@ body {
   z-index:3;
   transition: all 2s ease-in;
 }
-
 #left-panel { left:40px; border-color:#FFB700; }
 #right-panel { right:40px; border-color:#1B5287; }
 
@@ -74,7 +68,6 @@ body {
   color:#00ffe0;
   margin-bottom:10px;
 }
-
 .panel-log {
   height:180px;
   overflow:hidden;
@@ -101,9 +94,9 @@ body {
   pointer-events:none;
 }
 
-/* =========================
-   MOBILE LAYOUT FIX
-   ========================= */
+/* =========================================
+       MOBILE RESPONSIVE — NO OVERLAP
+   ========================================= */
 @media (max-width: 768px) {
 
   body {
@@ -128,35 +121,42 @@ body {
     margin:0 auto !important;
   }
 
-  /* reactor resized for mobile */
+  /* PANEL 1 / CIRCLE / PANEL 2 LAYOUT */
+  #left-panel { order:1; margin-bottom:10px; }
+  #reactor-fill { order:2; }
+  #countdown-container { order:2; }
+  #right-panel { order:3; margin-top:10px; }
+
+  /* dynamic circle size for countdown */
   #reactor-fill {
-    width:80vw !important;
-    height:80vw !important;
-    max-width:380px !important;
-    max-height:380px !important;
+    width:min(75vw, 330px) !important;
+    height:min(75vw, 330px) !important;
+    max-width:330px !important;
+    max-height:330px !important;
   }
 
-  /* countdown — reduced for mobile too */
+  /* countdown font scales with circle */
   #countdown-label {
-    font-size:4vw !important;
+    font-size: calc(min(75vw, 330px) * 0.07) !important;
   }
-
   #countdown {
-    font-size:7vw !important;
+    font-size: calc(min(75vw, 330px) * 0.12) !important;
   }
 
-  /* Stack order: PANEL 1 → CIRCLE → PANEL 2 */
-  #left-panel { order:1 !important; }
-  #reactor-fill { order:2 !important; }
-  #countdown-container { order:2 !important; }
-  #right-panel { order:3 !important; }
+  /* center countdown inside circle */
+  #countdown-container {
+    top:50% !important;
+    left:50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin:0 !important;
+    text-align:center !important;
+  }
 
-  /* panels centered */
+  /* side panels responsive */
   .side-panel {
     width:90vw !important;
     max-width:380px !important;
     height:auto !important;
-    margin-top:20px;
     transform:none !important;
   }
 
@@ -170,7 +170,7 @@ body {
     font-size:3.8vw !important;
   }
 
-  /* matrix fixed to screen */
+  /* matrix covers whole page and scrolls correctly */
   #matrix-canvas {
     position:fixed !important;
     top:0 !important;
@@ -229,6 +229,7 @@ const fixedStartDate = new Date("2025-12-05T00:00:00");
 const targetDate = new Date("2026-01-06T00:00:00");
 const totalDuration = targetDate - fixedStartDate;
 
+/* logs */
 function cycleLogs(el, lines){
   let i=0;
   el._int = setInterval(()=>{
@@ -252,7 +253,6 @@ const alphaLogs = [
   "Analyzing packets... system stable",
   "Telemetry anomaly:> check channel >"
 ];
-
 const omegaLogs = [
   "Monitoring sequences... 7810892",
   "Transmission nominal...10-10",
@@ -278,9 +278,8 @@ const ideathonLogs = [
   "Innovation pulse strong — continue...",
   "Finalizing ideathon sequence..."
 ];
-
 const hackathonLogs = [
-  "Hackathon Node X initiated",
+   "Hackathon Node X initiated",
   "Start Date - 24-Feb-2026",
   "End Date - 6-March-2026",
   "Systems ready — time to innovate!",
@@ -291,8 +290,10 @@ const hackathonLogs = [
   "Final checks complete — good luck!"
 ];
 
+/* easing */
 function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
 
+/* state */
 let countdownOver=false;
 let draining=false;
 let drainProgress=0;
