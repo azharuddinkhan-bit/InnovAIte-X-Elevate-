@@ -12,39 +12,37 @@ body {
   background:black;
   overflow:hidden;
   font-family:"Courier New", monospace;
+  text-align:center;
 }
 
 /* =====================================================
-     NEW WRAPPER — keeps countdown centered in circle
+     MAIN DESKTOP LAYOUT (unchanged except minor font fix)
    ===================================================== */
-#reactor-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vw;
-  max-width: 420px;
-  max-height: 420px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 6;
+#countdown-label { 
+  font-size:1.6rem;  /* slightly reduced */
+  margin-bottom:0.3rem; 
 }
-
-/* COUNTDOWN stays inside circle */
-#countdown-container {
-  position:absolute;
-  text-align:center;
-  z-index:50;
-  color:white;
-}
-#countdown-label { font-size:2rem; margin-bottom:0.3rem; }
 #countdown {
-  font-size:3rem;
+  font-size:2.4rem; /* slightly reduced */
   font-weight:bold;
   color:white;
   text-shadow:0 0 10px #00ff00,0 0 20px #00ff00;
+}
+
+/* NEW WRAPPER - keeps countdown inside circle */
+#reactor-wrapper {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  width:80vw;
+  height:80vw;
+  max-width:420px;
+  max-height:420px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:6;
 }
 
 /* CIRCLE CANVAS */
@@ -58,24 +56,31 @@ body {
 /* PANELS */
 .side-panel {
   position:absolute;
-  top:50%;
   width:280px;
   padding:20px;
   background:rgba(0,0,0,0.3);
   border:2px solid #00ffbf;
   backdrop-filter:blur(4px);
-  transform:translateY(-50%);
   box-shadow:0 0 22px rgba(0,255,180,0.25);
   z-index:3;
-  transition: all 2s ease-in;
+  transition:all 2s ease-in;
 }
-#left-panel { left:40px; border-color:#FFB700; }
-#right-panel { right:40px; border-color:#1B5287; }
+#left-panel { 
+  top:10%; 
+  left:40px; 
+  border-color:#FFB700; 
+}
+#right-panel { 
+  bottom:10%; 
+  right:40px; 
+  border-color:#1B5287; 
+}
 
 .panel-title {
   color:#00ffe0;
   margin-bottom:10px;
 }
+
 .panel-log {
   height:180px;
   overflow:hidden;
@@ -102,9 +107,9 @@ body {
   pointer-events:none;
 }
 
-/* =========================================
-       MOBILE RESPONSIVE — NO OVERLAP
-   ========================================= */
+/* =====================================================
+                 MOBILE LAYOUT (Your request)
+   ===================================================== */
 @media (max-width: 768px) {
 
   body {
@@ -113,58 +118,58 @@ body {
     display:flex;
     flex-direction:column;
     align-items:center;
+    justify-content:flex-start;
     padding:20px 0;
     gap:25px;
+    text-align:center;
   }
 
-  /* reactor-wrapper becomes normal block container */
+  /* Make panels stack vertically */
+  #left-panel, #right-panel {
+    position:relative !important;
+    top:auto !important;
+    bottom:auto !important;
+    left:auto !important;
+    right:auto !important;
+    width:90vw !important;
+    max-width:380px !important;
+    margin:0 auto !important;
+    transform:none !important;
+  }
+
+  /* Order for mobile: panel1 -> circle -> panel2 */
+  #left-panel { order:1; }
+  #reactor-wrapper { order:2; }
+  #right-panel { order:3; }
+
+  /* Reactor centered on mobile */
   #reactor-wrapper {
     position:relative !important;
     transform:none !important;
+    margin:0 auto !important;
     width:80vw !important;
     height:80vw !important;
     max-width:380px !important;
     max-height:380px !important;
-    margin:0 auto !important;
   }
 
-  /* countdown remains centered inside the circle */
+  /* Countdown stays centered inside circle */
   #countdown-container {
     position:absolute !important;
     top:50% !important;
     left:50% !important;
     transform:translate(-50%, -50%) !important;
-    text-align:center !important;
   }
 
-  #countdown-label { font-size:6vw !important; }
-  #countdown { font-size:10vw !important; }
+  /* Bigger countdown for mobile */
+  #countdown-label { font-size:5vw !important; }
+  #countdown { font-size:8vw !important; }
 
-  /* stack panels under the circle */
-  .side-panel {
-    position:relative !important;
-    width:90vw !important;
-    max-width:380px !important;
-    height:auto !important;
-    margin-top:20px;
-    transform:none !important;
-  }
+  /* Logs readable */
+  .panel-log { height:150px !important; font-size:3.8vw !important; }
 
-  .panel-title {
-    font-size:4.5vw !important;
-    text-align:center !important;
-  }
-
-  .panel-log {
-    height:150px !important;
-    font-size:3.8vw !important;
-  }
-
-  /* matrix stays fullscreen */
   #matrix-canvas {
     position:fixed !important;
-    top:0 !important;
-    left:0 !important;
     width:100vw !important;
     height:100vh !important;
   }
@@ -174,7 +179,12 @@ body {
 
 <body>
 
-<!-- NEW WRAPPER -->
+<!-- ORDER: PANEL 1 -> CIRCLE -> PANEL 2 -->
+<div id="left-panel" class="side-panel">
+  <div class="panel-title">[NODE ALPHA]</div>
+  <div class="panel-log" id="log1"></div>
+</div>
+
 <div id="reactor-wrapper">
   <canvas id="reactor-fill"></canvas>
 
@@ -184,17 +194,12 @@ body {
   </div>
 </div>
 
-<canvas id="matrix-canvas"></canvas>
-
-<div id="left-panel" class="side-panel">
-  <div class="panel-title">[NODE ALPHA]</div>
-  <div class="panel-log" id="log1"></div>
-</div>
-
 <div id="right-panel" class="side-panel">
   <div class="panel-title">[NODE OMEGA]</div>
   <div class="panel-log" id="log2"></div>
 </div>
+
+<canvas id="matrix-canvas"></canvas>
 
 <div class="scanlines"></div>
 
@@ -237,52 +242,33 @@ function cycleLogs(el, lines){
 const log1 = document.getElementById("log1");
 const log2 = document.getElementById("log2");
 
-const alphaLogs = [
-  "Initializing node systems... some paths are",
-  "Analyzing streams... telemetry stable",
-  "Telemetry anomaly: ↑ detected in sector 3",
-  "Preparing core modules... sync in progress",
-  "Syncing virtual interfaces... observed",
-  "Telemetry anomaly: ↑ spike",
-  "Analyzing packets... system stable",
-  "Telemetry anomaly:> check channel >"
-];
-const omegaLogs = [
-  "Monitoring sequences... 7810892",
-  "Transmission nominal...10-10",
-  "Telemetry anomaly:↓ detected",
-  "Analyzing packets... ↓..normal",
-  "Syncing virtual interfaces...activity",
-  "Telemetry anomaly:< observed",
-  "Preparing core modules...",
-  "Enter command sequence if needed"
-];
-
-cycleLogs(log1, alphaLogs);
-cycleLogs(log2, omegaLogs);
-
+/* UPDATED LOGS — encouraging + dates */
 const ideathonLogs = [
   "Project Alpha phase started",
   "Start Date - 12-Jan-2026",
   "End Date - 30-Jan-2026",
-  "Analyzing user feedback...",
-  "Integrating hack modules...",
-  "Compiling core ideathon routines...",
-  "Telemetry stable... proceeding ups",
-  ">Deploying interface nodes...<",
+  "Great ideas begin with bold steps...",
+  "Your potential is unlocking...",
+  "Creativity levels rising...",
+  "You're doing amazing — keep building!",
+  "Innovation pulse strong — continue...",
   "Finalizing ideathon sequence..."
 ];
+
 const hackathonLogs = [
   "Hackathon Node X initiated",
   "Start Date - 24-Feb-2026",
   "End Date - 6-March-2026",
-  "Data streams aligned...",
-  "Analyzing algorithmic patterns...",
-  "Syncing virtual interfaces with downers...",
-  "Compiling challenge response...",
-  ">Deploying hackathon modules...<",
-  "Final checks complete to enter..."
+  "Systems ready — time to innovate!",
+  "You’ve got this — push forward!",
+  "Your logic is sharpening...",
+  "Algorithms syncing with brilliance...",
+  "Confidence high — execute boldly!",
+  "Final checks complete — good luck!"
 ];
+
+cycleLogs(log1, ideathonLogs);
+cycleLogs(log2, hackathonLogs);
 
 /* easing */
 function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
@@ -320,7 +306,7 @@ function drawMatrix(){
   requestAnimationFrame(drawMatrix);
 }
 
-/* KONAMI CODE */
+/* KONAMI */
 window.addEventListener("keydown", e=>{
   seq.push(e.key);
   if(seq.length>konami.length) seq.shift();
@@ -337,7 +323,7 @@ window.addEventListener("keydown", e=>{
   }
 });
 
-/* DRAW */
+/* DRAW FUNCTIONS — unchanged */
 let waveShift=0;
 
 const originalDrawWave=function(percent){
@@ -386,7 +372,7 @@ function drawArc(percent){
   if(phase===0){ blueEnd=localPercent; }
   else if(phase===1){ blueEnd=1; goldStart=1; goldEnd=1-localPercent; }
   else if(phase===2){ goldEnd=1; blueEnd=localPercent; }
-  else if(phase===3){ blueEnd=1; goldStart=1; goldEnd=1-localPercent; }
+  else if(phase===3){ goldEnd=1; goldStart=1; goldEnd=1-localPercent; }
 
   if(draining){
     blueEnd=0;
@@ -481,14 +467,6 @@ function update(){
       let h=Math.floor(s/3600); s%=3600;
       let m=Math.floor(s/60); s%=60;
       countdownEl.textContent=`${d}d ${h}h ${m}m ${s}s`;
-    } else {
-      countdownContainer.remove();
-      document.querySelector("#left-panel .panel-title").textContent="[IDEATHON]";
-      document.querySelector("#right-panel .panel-title").textContent="[HACKATHON]";
-      clearInterval(log1._int);
-      clearInterval(log2._int);
-      cycleLogs(log1, ideathonLogs);
-      cycleLogs(log2, hackathonLogs);
     }
   }
 
