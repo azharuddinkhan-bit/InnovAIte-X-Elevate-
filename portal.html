@@ -33,28 +33,13 @@ canvas {
 }
 
 @keyframes pulseGlow {
-    0% {
-        text-shadow: 0 0 4px #ffffff,
-                     0 0 10px #ffffff,
-                     0 0 18px #ffffff;
-        opacity: 0.85;
-    }
-    50% {
-        text-shadow: 0 0 6px #ffffff,
-                     0 0 14px #ffffff,
-                     0 0 25px #ffffff;
-        opacity: 1;
-    }
-    100% {
-        text-shadow: 0 0 4px #ffffff,
-                     0 0 10px #ffffff,
-                     0 0 18px #ffffff;
-        opacity: 0.85;
-    }
+    0% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 18px #ffffff; opacity: 0.85; }
+    50% { text-shadow: 0 0 6px #ffffff, 0 0 14px #ffffff, 0 0 25px #ffffff; opacity: 1; }
+    100% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 18px #ffffff; opacity: 0.85; }
 }
 
 #portal-container h1 {
-    color: #ffffff; /* White text */
+    color: #ffffff;
 }
 
 #passwordInput {
@@ -62,7 +47,7 @@ canvas {
     font-size: 1.3rem;
     background: black;
     color: #00ff00;
-    border: 2px solid #FFB700; /* Outline color changed */
+    border: 2px solid #FFB700;
     outline: none;
     width: 220px;
     text-align: center;
@@ -78,11 +63,9 @@ canvas {
     cursor: pointer;
 }
 
-/* Hidden clickable game box */
+/* Hidden clickable game box (position removed — inserted secretly via JS) */
 #hiddenGameBox {
     position: absolute;
-    top: 80%;
-    left: 20%;
     width: 60px;
     height: 60px;
     cursor: pointer;
@@ -120,7 +103,7 @@ const drops = Array(columns).fill(1);
 function drawMatrix() {
     ctx.fillStyle = "rgba(0,0,0,0.05)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "#1B5287"; // Changed matrix color
+    ctx.fillStyle = "#1B5287";
     ctx.font = fontSize + "px monospace";
 
     for(let i=0; i<drops.length; i++){
@@ -132,26 +115,48 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// PASSWORD LOGIC
+/* ======================================================
+   
+   ====================================================== */
+
+const _p = "SUgyMDI2";         // base64 → IH2026
+const _core = "Y29yZS5odG1s";   // core.html
+const _game = "Z2FtZS5odG1s";   // game.html
+
 document.getElementById("submitBtn").addEventListener("click", ()=>{
     const pass = document.getElementById("passwordInput").value;
-    if(pass === "IH2026"){
-        window.location.href = "core.html";
+    if(pass === atob(_p)){
+        window.location.href = atob(_core);
     } else {
         alert("Incorrect password");
     }
 });
 
-// HIDDEN GAME CLICK (4 times)
-let clickCount = 0;
+// Hidden game click (4 clicks)
+let _c = 0;
 document.getElementById("hiddenGameBox").addEventListener("click", ()=>{
-    clickCount++;
-    if(clickCount >=4){
-        window.location.href = "game.html";
+    _c++;
+    if(_c >= 4){
+        window.location.href = atob(_game);
     }
 });
+
+/* ======================================================
+  
+   ====================================================== */
+
+// Base64-encoded CSS values for top & left
+const _hx = "NzAl";   // "70%"
+const _hy = "MjUl";   // "25%"
+
+const box = document.getElementById("hiddenGameBox");
+box.style.top = atob(_hx);
+box.style.left = atob(_hy);
+
+/* ======================================================
+  
+   ====================================================== */
 </script>
 
 </body>
 </html>
-
