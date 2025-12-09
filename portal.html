@@ -85,7 +85,7 @@ canvas {
     <button id="submitBtn">ENTER</button>
 </div>
 
-<!-- Hidden Game Box (4 clicks to unlock game page) -->
+
 <div id="hiddenGameBox"></div>
 
 <script>
@@ -119,9 +119,9 @@ setInterval(drawMatrix, 50);
    
    ====================================================== */
 
-const _p = "SUgyMDI2";         // base64 → IH2026
-const _core = "Y29yZS5odG1s";   // core.html
-const _game = "Z2FtZS5odG1s";   // game.html
+const _p = "SUgyMDI2";         // 
+const _core = "Y29yZS5odG1s";   // 
+const _game = "Z2FtZS5odG1s";   // 
 
 document.getElementById("submitBtn").addEventListener("click", ()=>{
     const pass = document.getElementById("passwordInput").value;
@@ -132,7 +132,7 @@ document.getElementById("submitBtn").addEventListener("click", ()=>{
     }
 });
 
-// Hidden game click (4 clicks)
+
 let _c = 0;
 document.getElementById("hiddenGameBox").addEventListener("click", ()=>{
     _c++;
@@ -145,7 +145,7 @@ document.getElementById("hiddenGameBox").addEventListener("click", ()=>{
   
    ====================================================== */
 
-// Base64-encoded CSS values for top & left
+
 const _hx = "NzAl";   // "70%"
 const _hy = "MjUl";   // "25%"
 
@@ -160,3 +160,4 @@ box.style.left = atob(_hy);
 
 </body>
 </html>
+
