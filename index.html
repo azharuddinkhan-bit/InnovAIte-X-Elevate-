@@ -26,12 +26,12 @@ body {
 }
 
 #countdown-label {
-  font-size:1.4rem !important;  /* reduced */
+  font-size:1.4rem !important;
   margin-bottom:0.3rem;
 }
 
 #countdown {
-  font-size:2.2rem !important;  /* reduced */
+  font-size:2.2rem !important;
   font-weight:bold;
   color:white;
   text-shadow:0 0 10px #00ff00,0 0 20px #00ff00;
@@ -127,7 +127,6 @@ body {
     margin:0 auto !important;
   }
 
-  /* KEEP countdown absolutely centered inside circle */
   #countdown-container {
     position:absolute !important;
     top:50% !important;
@@ -135,7 +134,6 @@ body {
     transform:translate(-50%,-50%) !important;
   }
 
-  /* reactor resized for mobile */
   #reactor-fill {
     width:80vw !important;
     height:80vw !important;
@@ -143,7 +141,6 @@ body {
     max-height:380px !important;
   }
 
-  /* countdown — reduced for mobile too */
   #countdown-label {
     font-size:4vw !important;
   }
@@ -152,13 +149,11 @@ body {
     font-size:7vw !important;
   }
 
-  /* Stack order: PANEL 1 → CIRCLE → PANEL 2 */
   #left-panel { order:1 !important; }
   #reactor-fill { order:2 !important; }
   #countdown-container { order:2 !important; }
   #right-panel { order:3 !important; }
 
-  /* panels centered */
   .side-panel {
     width:90vw !important;
     max-width:380px !important;
@@ -177,7 +172,6 @@ body {
     font-size:3.8vw !important;
   }
 
-  /* matrix fixed to screen */
   #matrix-canvas {
     position:fixed !important;
     top:0 !important;
@@ -230,7 +224,7 @@ function resizeCanvas(){
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-/* ------------------- ORIGINAL SCRIPT (UNCHANGED FUNCTIONALITY) ------------------- */
+/* ------------------- ORIGINAL SCRIPT ------------------- */
 
 const fixedStartDate = new Date("2025-12-05T00:00:00");
 const targetDate = new Date("2026-01-06T00:00:00");
@@ -274,6 +268,20 @@ const omegaLogs = [
 cycleLogs(log1, alphaLogs);
 cycleLogs(log2, omegaLogs);
 
+/* --- OBFUSCATED KONAMI CODE --- */
+let seq=[];
+const _k=[
+  "QXJyb3dVcA==",
+  "QXJyb3dVcA==",
+  "QXJyb3dEb3du",
+  "QXJyb3dEb3du",
+  "QXJyb3dSaWdodA==",
+  "QXJyb3dMZWZ0",
+  "RW50ZXI="
+];
+const konami=_k.map(x=>atob(x));
+/* --- END OBFUSCATION --- */
+
 const ideathonLogs = [
   "Project Alpha phase started",
   "Start Date - 12-Jan-2026",
@@ -303,8 +311,6 @@ function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
 let countdownOver=false;
 let draining=false;
 let drainProgress=0;
-let seq=[];
-const konami=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowRight","ArrowLeft","Enter"];
 
 /* MATRIX */
 let matrixActive=false;
@@ -332,7 +338,7 @@ function drawMatrix(){
   requestAnimationFrame(drawMatrix);
 }
 
-/* KONAMI CODE */
+/* KONAMI LISTENER */
 window.addEventListener("keydown", e=>{
   seq.push(e.key);
   if(seq.length>konami.length) seq.shift();
@@ -349,7 +355,6 @@ window.addEventListener("keydown", e=>{
   }
 });
 
-/* DRAW */
 let waveShift=0;
 
 const originalDrawWave=function(percent){
@@ -452,7 +457,6 @@ function draw(percent){
   ctx.restore();
 }
 
-/* MAIN LOOP */
 const countdownEl=document.getElementById("countdown");
 const countdownContainer=document.getElementById("countdown-container");
 
