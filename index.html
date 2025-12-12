@@ -229,9 +229,6 @@ resizeCanvas();
 const fixedStartDate = new Date("2025-12-05T00:00:00");
 const targetDate = new Date("2026-01-06T00:00:00");
 const totalDuration = targetDate - fixedStartDate;
-//const startTime = Date.now();
-//const targetDate = startTime + 30000; // 30 seconds
-//const totalDuration = 30000; // 30 seconds
 
 function cycleLogs(el, lines){
   let i=0;
@@ -394,42 +391,6 @@ function drawRings(){
   }
 }
 
-/* function drawArc(percent){
-  const startAngle=-Math.PI/2;
-
-  const phaseTime=0.25;
-  let phase=Math.min(Math.floor(percent/phaseTime),3);
-  let localPercent=(percent-phase*phaseTime)/phaseTime;
-
-  let blueEnd=0,goldStart=0,goldEnd=0;
-
-  if(phase===0){ blueEnd=localPercent; }
-  else if(phase===1){ blueEnd=1; goldStart=1; goldEnd=1-localPercent; }
-  else if(phase===2){ goldEnd=1; blueEnd=localPercent; }
-  else if(phase===3){ blueEnd=1; goldStart=1; goldEnd=1-localPercent; }
-
-  if(draining){
-    blueEnd=0;
-    goldStart=0;
-    goldEnd=1-drainProgress;
-  }
-
-  function arc(color,start,end){
-    if(end<=0) return;
-    ctx.beginPath();
-    ctx.strokeStyle=color;
-    ctx.shadowColor=color;
-    ctx.shadowBlur=20;
-    ctx.lineWidth=8;
-    ctx.arc(cx,cy,radius,startAngle + start*2*Math.PI, startAngle + end*2*Math.PI);
-    ctx.stroke();
-  }
-
-  arc("gold", goldEnd, goldStart);
-  arc("blue", 0, blueEnd);
-
-  ctx.shadowBlur=0;
-}*/
 function drawArc(percent){
   const startAngle = -Math.PI / 2;
 
@@ -439,7 +400,6 @@ function drawArc(percent){
 
   let blueEnd = 0, goldEnd = 0;
 
-  // Determine end of arcs for each phase
   if(phase === 0){ 
     blueEnd = localPercent; 
   }
@@ -472,20 +432,19 @@ function drawArc(percent){
     ctx.stroke();
   }
 
-  // Draw order per phase: the active color is always on top
   switch(phase){
-    case 0: // Blue growing
+    case 0:
       arc("blue", blueEnd);
       break;
-    case 1: // Yellow growing on top of full blue
+    case 1:
       arc("blue", blueEnd);
       arc("gold", goldEnd);
       break;
-    case 2: // Blue growing on top of full yellow
+    case 2:
       arc("gold", goldEnd);
       arc("blue", blueEnd);
       break;
-    case 3: // Yellow shrinking on top of full blue
+    case 3:
       arc("blue", blueEnd);
       arc("gold", goldEnd);
       break;
@@ -493,7 +452,6 @@ function drawArc(percent){
 
   ctx.shadowBlur = 0;
 }
-
 
 function drawElevate(){
   ctx.fillStyle="#fff";
@@ -503,6 +461,25 @@ function drawElevate(){
   ctx.shadowColor="#fff";
   ctx.shadowBlur=20;
   ctx.fillText("ELEVATE", cx, cy);
+}
+
+/* ------------------ ANIMATION PERSISTENCE FIX ------------------ */
+let visualPercent = 0;
+let lastTime = performance.now();
+
+function animateProgress(realPercent){
+  const now = performance.now();
+  const delta = (now - lastTime) / 1000;
+  lastTime = now;
+
+  const animationSpeed = 0.9;
+
+  visualPercent += (realPercent - visualPercent) * animationSpeed * delta;
+
+  if(visualPercent > 1) visualPercent = 1;
+  if(visualPercent < 0) visualPercent = 0;
+
+  return visualPercent;
 }
 
 function draw(percent){
@@ -555,7 +532,9 @@ function update(){
     }
   }
 
-  draw(percent);
+  /* <-- NEW: use animated visual percent instead of raw percent */
+  const visual = animateProgress(percent);
+  draw(visual);
 
   if(!draining){
     if(diff>0){
